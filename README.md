@@ -83,7 +83,16 @@ RUN"DEMO"                                the demo (below); it runs until you res
 ```
 
 `RUN` of a binary resets the firmware: the CPC restarts when the program ends. To return to
-BASIC, reserve the memory and `CALL` it: `MEMORY &3FFF:LOAD"NAME":CALL &4000`.
+BASIC, reserve the memory and `CALL` it: `MEMORY &3FFF:LOAD"NAME":CALL &4000`. (Open: a C program
+started like that - HELLOC - began again after its key instead of returning; seen 2026-11-17 with
+the old and the new `crt0.s` alike. `RUN` is fine.)
+
+**Memory for C programs:** code, data and stack go from &4000 up and must end below HIMEM, which
+is **&A5F7** with the M4 ROM (`PRINT HEX$(HIMEM)`). `crt0.s` gives the program its own stack of
+1 KB after its data (since 2026-11-17): the firmware's stack has only about 200 bytes left when
+`main` starts, and deeper C code ran into the firmware's RAM below &BF00. The end is in the
+linker's map: `s__STACK` + `l__STACK` (e.g. `build/hello.map`). Data below &4000
+(`--data-loc`) does not work with it: the stack has to stay above &4000.
 
 `make shot` is for checking a program without watching it (scripts, AI assistants): the emulator
 runs in real time with a hidden window and its command API on `127.0.0.1:API_PORT` (default 6128),

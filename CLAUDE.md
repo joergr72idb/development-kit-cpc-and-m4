@@ -32,6 +32,12 @@ Toolchain only - real programs live in their own project folders and point `DEV`
 - `RUN"X"` of a binary resets the firmware, and the CPC restarts when the program returns: samples wait
   for a key. `LOAD` of a binary into &4000 needs `MEMORY &3FFF` first (else "Memory full").
 - SDCC: `crt0.s` must be the first object (its JP at &4000 is the entry); `--code-loc 0x4010`.
+  Since 2026-11-17 crt0 clears `_DATA` and sets its own 1 KB stack (`_STACK`, last area): the firmware's stack
+  (SP &BFC8 in main, &BF00-&BFFF) overflowed into firmware RAM - fujinet-network-cpc's test failed depending on
+  where its data was (painted: everything down to &BF00 used). HIMEM with the M4 ROM is &A5F7: code + data +
+  stack must end below it (map: s__STACK + l__STACK). The stack must stay above &4000 (lower ROM). Checked:
+  HELLOC, FNHELLO, DEMO with RUN. `MEMORY &3FFF:LOAD"HELLOC":CALL &4000` restarts HELLOC after its key
+  instead of returning to BASIC - old crt0 too, not looked into yet.
   `tools/cpcbin.py` turns the .ihx into an AMSDOS binary. iDSK takes one `-i` per call.
 - M4 protocol details verified against Duke's examples and the emulator source: sizes and ports are
   little-endian, IP addresses last octet first, the socket table updates by itself (poll it).

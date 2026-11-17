@@ -14,7 +14,7 @@ JOBS="$(nproc)"
 RASM_TAG=v3.3.3
 IDSK_TAG=v0.20
 CPCSE_TAG=v0.16.0               # CPCSyntaxError changes almost daily - update on purpose, then retest
-FNCPC_REV=acbf917               # fujinet-network-cpc (optional part "fujinet", as tested 2026-11-17)
+FNCPC_REV=c7592dd               # fujinet-network-cpc (optional part "fujinet", as tested 2026-11-17)
 
 mkdir -p "$SRC" "$OPT" "$LOG"
 
